@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Interest Calculator</title>
+<style>
+  /* ============ Design tokens ============ */
+  :root {
+    --bg: #f4f7fb;            /* page backdrop behind white cards */
+    --card: #ffffff;
+    --blue: #2563eb;          /* accent */
+    --blue-dark: #1d4ed8;
+    --blue-soft: #eff6ff;
+    --green: #16a34a;         /* total highlight */
+    --green-soft: #f0fdf4;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --danger: #dc2626;
+    --danger-soft: #fef2f2;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(30, 41, 59, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    line-height: 1.5;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ============ Cards ============ */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 26px;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .card:hover { box-shadow: 0 8px 28px rgba(30, 41, 59, 0.12); }
+
+  /* ============ Header ============ */
+  .app-header { text-align: center; padding: 30px 26px; border-top: 5px solid var(--blue); }
+  .app-header h1 { font-size: 1.65rem; font-weight: 700; color: var(--blue-dark); letter-spacing: -0.01em; }
+  .app-header p { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
+
+  /* ============ Form ============ */
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .field .optional { color: var(--muted); font-weight: 400; }
+
+  input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .date-row { display: flex; gap: 8px; align-items: center; }
+  .date-row input { flex: 1; }
+
+  .btn-today {
+    white-space: nowrap;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--blue);
+    background: var(--blue-soft);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .btn-today:hover { background: #dbeafe; transform: translateY(-1px); }
+
+  /* ============ Errors ============ */
+  .error-box {
+    display: none;
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  .error-box.show { display: block; }
+
+  /* ============ Buttons ============ */
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { background: #f8fafc; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #15803d; }
+
+  /* ============ Results ============ */
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--blue-soft);
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 0.95rem;
+  }
+  .result-row:last-of-type { border-bottom: none; }
+  .result-row .r-label { color: var(--muted); }
+  .result-row .r-value { font-weight: 600; text-align: right; }
+
+  .total-banner {
+    margin-top: 14px;
+    background: var(--green-soft);
+    border: 1.5px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .total-banner .t-label { font-weight: 600; color: #166534; font-size: 0.95rem; }
+  .total-banner .t-value { font-size: 1.6rem; font-weight: 800; color: var(--green); letter-spacing: -0.02em; }
+
+  /* Pop animation whenever results refresh */
+  @keyframes pop {
+    0%   { transform: scale(0.985); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-pop { animation: pop 0.35s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .placeholder-note { color: var(--muted); font-size: 0.92rem; text-align: center; padding: 8px 0; }
+  .hidden { display: none; }
+
+  /* ============ Summary ============ */
+  .pay-line {
+    margin-top: 16px;
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+    word-break: break-word;
+  }
+  .pay-line .pay-amt { color: var(--green); }
+
+  /* ============ Saved summaries ============ */
+  .saved-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .saved-head .section-title { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+  .btn-clear {
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .btn-clear:hover { background: var(--danger-soft); }
+
+  .saved-item {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .saved-item:hover { border-color: var(--blue); box-shadow: 0 2px 10px rgba(37, 99, 235, 0.1); }
+  .saved-item .s-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .saved-item .s-name { font-weight: 700; }
+  .saved-item .s-amt { font-weight: 800; color: var(--green); }
+  .saved-item .s-meta { color: var(--muted); font-size: 0.83rem; margin-top: 4px; }
+  .saved-item .s-actions { margin-top: 8px; display: flex; gap: 12px; }
+  .saved-item .s-actions button {
+    background: none; border: none; cursor: pointer; font-family: inherit;
+    font-size: 0.82rem; font-weight: 600; padding: 4px 0;
+  }
+  .s-load { color: var(--blue); }
+  .s-del { color: var(--danger); }
+  .s-load:hover, .s-del:hover { text-decoration: underline; }
+
+  .storage-note { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+  /* ============ Print: only the Summary card ============ */
+  @media print {
+    body { background: #fff; padding: 0; }
+    body * { visibility: hidden; }
+    #summaryCard, #summaryCard * { visibility: visible; }
+    #summaryCard {
+      position: absolute;
+      left: 0; top: 0; width: 100%;
+      box-shadow: none;
+      border: 1px solid #ccc;
+    }
+    #summaryCard .no-print { display: none !important; }
+  }
+
+  /* ============ Mobile ============ */
+  @media (max-width: 480px) {
+    .card { padding: 22px 18px; }
+    .app-header h1 { font-size: 1.35rem; }
+    .date-row { flex-wrap: wrap; }
+    .btn-today { width: 100%; }
+    .btn { min-width: 100%; }
+    .total-banner .t-value { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ Title card + form ============ -->
+  <div class="card app-header">
+    <h1>Daily Interest Calculator</h1>
+    <p>Interest rule: ₹1 per day for every ₹1,500 of principal</p>
+  </div>
+
+  <div class="card">
+    <div id="errorBox" class="error-box" role="alert"></div>
+
+    <div class="field">
+      <label for="personName">Person Name <span class="optional">(optional)</span></label>
+      <input type="text" id="personName" placeholder="Enter person's name" autocomplete="name" />
+    </div>
+
+    <div class="field">
+      <label for="amount">Amount (₹)</label>
+      <input type="number" id="amount" placeholder="60000" min="0" inputmode="decimal" />
+    </div>
+
+    <div class="field">
+      <label for="fromDate">From Date</label>
+      <input type="date" id="fromDate" />
+    </div>
+
+    <div class="field">
+      <label for="toDate">To Date</label>
+      <div class="date-row">
+        <input type="date" id="toDate" />
+        <button type="button" class="btn-today" id="todayBtn">Use Today's Date</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="calcBtn">Calculate</button>
+      <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
+      <button type="button" class="btn btn-ghost" id="printBtn">Print Summary</button>
+    </div>
+  </div>
+
+  <!-- ============ Results card ============ -->
+  <div class="card" id="resultsCard">
+    <div class="section-title">Calculation Results</div>
+    <div id="resultsEmpty" class="placeholder-note">Fill in the amount and dates to see the calculation.</div>
+    <div id="resultsBody" class="hidden">
+      <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="rRange"></span></div>
+      <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="rDays"></span></div>
+      <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="rDaily"></span></div>
+      <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="rInterest"></span></div>
+      <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="rPrincipal"></span></div>
+      <div class="total-banner">
+        <span class="t-label">Total Amount Payable</span>
+        <span class="t-value" id="rTotal"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Summary card (printable) ============ -->
+  <div class="card" id="summaryCard">
+    <div class="section-title">Summary</div>
+    <div id="summaryEmpty" class="placeholder-note">The summary appears here after a valid calculation.</div>
+    <div id="summaryBody" class="hidden">
+      <div class="result-row"><span class="r-label">Person Name</span><span class="r-value" id="sName"></span></div>
+      <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="sPrincipal"></span></div>
+      <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="sRange"></span></div>
+      <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="sDays"></span></div>
+      <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="sDaily"></span></div>
+      <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="sInterest"></span></div>
+      <div class="result-row"><span class="r-label">Total Amount Payable</span><span class="r-value" id="sTotal"></span></div>
+      <div class="pay-line" id="payLine"></div>
+      <div class="btn-row no-print" style="margin-top:16px;">
+        <button type="button" class="btn btn-green" id="saveBtn">Save Summary</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Saved summaries card ============ -->
+  <div class="card" id="savedCard">
+    <div class="saved-head">
+      <div class="section-title">Saved Summaries</div>
+      <button type="button" class="btn-clear" id="clearAllBtn">Clear All</button>
+    </div>
+    <div id="savedList"></div>
+    <div id="savedEmpty" class="placeholder-note">No saved summaries yet. Click "Save Summary" after a calculation.</div>
+    <div class="storage-note" id="storageNote"></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==================== Element references ==================== */
+  const el = (id) => document.getElementById(id);
+  const nameInput  = el("personName");
+  const amountInput = el("amount");
+  const fromInput  = el("fromDate");
+  const toInput    = el("toDate");
+  const errorBox   = el("errorBox");
+
+  const resultsCard  = el("resultsCard");
+  const resultsBody  = el("resultsBody");
+  const resultsEmpty = el("resultsEmpty");
+  const summaryBody  = el("summaryBody");
+  const summaryEmpty = el("summaryEmpty");
+  const savedList    = el("savedList");
+  const savedEmpty   = el("savedEmpty");
+
+  const STORAGE_KEY = "interest-calculator-summaries";
+
+  /* Holds the last valid calculation (used by Save Summary) */
+  let lastResult = null;
+
+  /* ==================== Formatting helpers ==================== */
+
+  /* Indian locale currency: 60000 -> ₹60,000.00 */
+  function formatINR(value, decimals = 2) {
+    return "₹" + value.toLocaleString("en-IN", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  /* Date object -> "1 January 2025" */
+  function formatDate(date) {
+    return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  /* Today's date as yyyy-mm-dd for the date input (local time, not UTC) */
+  function todayISO() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  /* Parse yyyy-mm-dd into a local-midnight Date to avoid timezone drift */
+  function parseISO(str) {
+    const [y, m, d] = str.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  /* ==================== Storage (localStorage with in-memory fallback) ==================== */
+  let memoryStore = [];
+  let storageAvailable = true;
+  try {
+    localStorage.setItem("__test__", "1");
+    localStorage.removeItem("__test__");
+  } catch (e) {
+    storageAvailable = false;
+    el("storageNote").textContent =
+      "Note: browser storage is unavailable here, so saved summaries last only for this session. Open the file directly in your browser to keep them permanently.";
+  }
+
+  function loadSaved() {
+    if (!storageAvailable) return memoryStore;
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (e) { return []; }
+  }
+
+  function persistSaved(items) {
+    if (!storageAvailable) { memoryStore = items; return; }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (e) { /* quota or privacy mode: silently keep in memory */ memoryStore = items; storageAvailable = false; }
+  }
+
+  /* ==================== Validation ==================== */
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.add("show");
+  }
+  function clearError() {
+    errorBox.textContent = "";
+    errorBox.classList.remove("show");
+  }
+
+  /* Returns {amount, from, to} if valid, otherwise null (and shows the error) */
+  function validate(showMessages) {
+    const amountRaw = amountInput.value.trim();
+    const fromRaw = fromInput.value;
+    const toRaw = toInput.value;
+
+    if (amountRaw === "") {
+      if (showMessages) showError("Please enter amount.");
+      return null;
+    }
+    const amount = Number(amountRaw);
+    if (!isFinite(amount) || amount <= 0) {
+      if (showMessages) showError("Amount must be a positive number.");
+      return null;
+    }
+    if (fromRaw === "") {
+      if (showMessages) showError("Please select start date.");
+      return null;
+    }
+    if (toRaw === "") {
+      if (showMessages) showError("Please select end date.");
+      return null;
+    }
+    const from = parseISO(fromRaw);
+    const to = parseISO(toRaw);
+    if (from > to) {
+      if (showMessages) showError("From Date cannot be greater than To Date.");
+      return null;
+    }
+    clearError();
+    return { amount, from, to };
+  }
+
+  /* ==================== Calculation ==================== */
+  function compute(inputs) {
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const days = Math.round((inputs.to - inputs.from) / MS_PER_DAY);
+    const oneDayInterest = inputs.amount / 1500;          /* ₹1 per day per ₹1500 */
+    const totalInterest = days * oneDayInterest;
+    const totalPayable = inputs.amount + totalInterest;
+    return {
+      name: nameInput.value.trim(),
+      amount: inputs.amount,
+      from: inputs.from,
+      to: inputs.to,
+      days,
+      oneDayInterest,
+      totalInterest,
+      totalPayable
+    };
+  }
+
+  /* ==================== Rendering ==================== */
+  function animate(node) {
+    node.classList.remove("animate-pop");
+    /* force reflow so the animation replays */
+    void node.offsetWidth;
+    node.classList.add("animate-pop");
+  }
+
+  function render(r) {
+    lastResult = r;
+
+    /* Results card */
+    resultsEmpty.classList.add("hidden");
+    resultsBody.classList.remove("hidden");
+    el("rRange").textContent = formatDate(r.from) + " \u2192 " + formatDate(r.to);
+    el("rDays").textContent = r.days.toLocaleString("en-IN") + " Days";
+    el("rDaily").textContent = formatINR(r.oneDayInterest) + " per day";
+    el("rInterest").textContent = formatINR(r.totalInterest);
+    el("rPrincipal").textContent = formatINR(r.amount);
+    el("rTotal").textContent = formatINR(r.totalPayable);
+    animate(resultsBody);
+
+    /* Summary card */
+    summaryEmpty.classList.add("hidden");
+    summaryBody.classList.remove("hidden");
+    el("sName").textContent = r.name || "\u2014";
+    el("sPrincipal").textContent = formatINR(r.amount, 0);
+    el("sRange").textContent = formatDate(r.from) + " to " + formatDate(r.to);
+    el("sDays").textContent = r.days.toLocaleString("en-IN");
+    el("sDaily").textContent = formatINR(r.oneDayInterest);
+    el("sInterest").textContent = formatINR(r.totalInterest);
+    el("sTotal").textContent = formatINR(r.totalPayable);
+
+    const pay = el("payLine");
+    if (r.name) {
+      pay.innerHTML = "Pay by " + escapeHTML(r.name) +
+        " \u2192 <span class='pay-amt'>" + formatINR(r.totalPayable, 0) + "</span>";
+    } else {
+      pay.innerHTML = "Total Amount Payable \u2192 <span class='pay-amt'>" +
+        formatINR(r.totalPayable, 0) + "</span>";
+    }
+    animate(summaryBody);
+  }
+
+  function clearResults() {
+    lastResult = null;
+    resultsBody.classList.add("hidden");
+    resultsEmpty.classList.remove("hidden");
+    summaryBody.classList.add("hidden");
+    summaryEmpty.classList.remove("hidden");
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* showMessages=false for silent live updates while typing */
+  function recalculate(showMessages) {
+    const inputs = validate(showMessages);
+    if (!inputs) {
+      if (!showMessages) clearResults();
+      return;
+    }
+    render(compute(inputs));
+  }
+
+  /* ==================== Saved summaries ==================== */
+  function renderSaved() {
+    const items = loadSaved();
+    savedList.innerHTML = "";
+    savedEmpty.classList.toggle("hidden", items.length > 0);
+    el("clearAllBtn").style.display = items.length > 0 ? "" : "none";
+
+    items.forEach((item, idx) => {
+      const div = document.createElement("div");
+      div.className = "saved-item";
+
+      const top = document.createElement("div");
+      top.className = "s-top";
+      const nm = document.createElement("span");
+      nm.className = "s-name";
+      nm.textContent = item.name || "Unnamed";
+      const amt = document.createElement("span");
+      amt.className = "s-amt";
+      amt.textContent = formatINR(item.totalPayable, 0);
+      top.append(nm, amt);
+
+      const meta = document.createElement("div");
+      meta.className = "s-meta";
+      meta.textContent =
+        "Principal " + formatINR(item.amount, 0) + " \u00b7 " +
+        formatDate(parseISO(item.fromISO)) + " to " + formatDate(parseISO(item.toISO)) +
+        " \u00b7 " + item.days.toLocaleString("en-IN") + " days" +
+        " \u00b7 Interest " + formatINR(item.totalInterest, 0) +
+        " \u00b7 Saved " + formatDate(new Date(item.savedAt));
+
+      const actions = document.createElement("div");
+      actions.className = "s-actions";
+      const loadBtn = document.createElement("button");
+      loadBtn.className = "s-load";
+      loadBtn.textContent = "Load";
+      loadBtn.addEventListener("click", () => loadEntry(item));
+      const delBtn = document.createElement("button");
+      delBtn.className = "s-del";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", () => {
+        const list = loadSaved();
+        list.splice(idx, 1);
+        persistSaved(list);
+        renderSaved();
+      });
+      actions.append(loadBtn, delBtn);
+
+      div.append(top, meta, actions);
+      savedList.appendChild(div);
+    });
+  }
+
+  function loadEntry(item) {
+    nameInput.value = item.name || "";
+    amountInput.value = item.amount;
+    fromInput.value = item.fromISO;
+    toInput.value = item.toISO;
+    recalculate(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function saveCurrent() {
+    if (!lastResult) return;
+    const items = loadSaved();
+    items.unshift({
+      name: lastResult.name,
+      amount: lastResult.amount,
+      fromISO: fromInput.value,
+      toISO: toInput.value,
+      days: lastResult.days,
+      oneDayInterest: lastResult.oneDayInterest,
+      totalInterest: lastResult.totalInterest,
+      totalPayable: lastResult.totalPayable,
+      savedAt: Date.now()
+    });
+    persistSaved(items);
+    renderSaved();
+  }
+
+  /* ==================== Events ==================== */
+
+  /* Live auto-calculation on every input change (silent validation) */
+  [nameInput, amountInput, fromInput, toInput].forEach((input) => {
+    input.addEventListener("input", () => recalculate(false));
+    input.addEventListener("change", () => recalculate(false));
+  });
+
+  /* Enter key triggers a full calculate with messages */
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.tagName === "INPUT") {
+      e.preventDefault();
+      recalculate(true);
+    }
+  });
+
+  el("calcBtn").addEventListener("click", () => recalculate(true));
+
+  el("resetBtn").addEventListener("click", () => {
+    nameInput.value = "";
+    amountInput.value = "";
+    fromInput.value = "";
+    toInput.value = todayISO();   /* To Date defaults back to today */
+    clearError();
+    clearResults();
+    nameInput.focus();
+  });
+
+  el("printBtn").addEventListener("click", () => {
+    if (!lastResult) {
+      recalculate(true);          /* surface the validation message instead */
+      if (!lastResult) return;
+    }
+    window.print();
+  });
+
+  el("todayBtn").addEventListener("click", () => {
+    toInput.value = todayISO();
+    recalculate(false);
+  });
+
+  el("saveBtn").addEventListener("click", saveCurrent);
+
+  el("clearAllBtn").addEventListener("click", () => {
+    if (confirm("Delete all saved summaries?")) {
+      persistSaved([]);
+      renderSaved();
+    }
+  });
+
+  /* ==================== Init ==================== */
+  toInput.value = todayISO();     /* To Date pre-filled with today */
+  renderSaved();
+})();
+</script>
+</body>
+</html>
