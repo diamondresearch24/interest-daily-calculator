@@ -7,12 +7,12 @@
 <style>
   /* ============ Design tokens ============ */
   :root {
-    --bg: #f4f7fb;            /* page backdrop behind white cards */
+    --bg: #f4f7fb;
     --card: #ffffff;
-    --blue: #2563eb;          /* accent */
+    --blue: #2563eb;
     --blue-dark: #1d4ed8;
     --blue-soft: #eff6ff;
-    --green: #16a34a;         /* total highlight */
+    --green: #16a34a;
     --green-soft: #f0fdf4;
     --ink: #1e293b;
     --muted: #64748b;
@@ -24,7 +24,6 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { -webkit-text-size-adjust: 100%; }
 
   body {
@@ -36,7 +35,8 @@
     line-height: 1.5;
   }
 
-  .wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .narrow { max-width: 640px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
   /* ============ Cards ============ */
   .card {
@@ -44,18 +44,54 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 28px 26px;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    transition: box-shadow 0.25s ease;
   }
   .card:hover { box-shadow: 0 8px 28px rgba(30, 41, 59, 0.12); }
 
-  /* ============ Header ============ */
-  .app-header { text-align: center; padding: 30px 26px; border-top: 5px solid var(--blue); }
+  /* ============ Header + tabs ============ */
+  .app-header { text-align: center; padding: 30px 26px 22px; border-top: 5px solid var(--blue); }
   .app-header h1 { font-size: 1.65rem; font-weight: 700; color: var(--blue-dark); letter-spacing: -0.01em; }
   .app-header p { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
 
+  .tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+    background: var(--blue-soft);
+    border-radius: 12px;
+    padding: 5px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--blue-dark);
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,0.7); }
+  .tab-btn.active {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  }
+
+  .mode { display: none; animation: fadeIn 0.3s ease; }
+  .mode.active { display: flex; flex-direction: column; gap: 20px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
   /* ============ Form ============ */
   .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
   .field .optional { color: var(--muted); font-weight: 400; }
 
   input[type="text"], input[type="number"], input[type="date"] {
@@ -94,7 +130,6 @@
   }
   .btn-today:hover { background: #dbeafe; transform: translateY(-1px); }
 
-  /* ============ Errors ============ */
   .error-box {
     display: none;
     background: var(--danger-soft);
@@ -111,7 +146,7 @@
   .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
   .btn {
     flex: 1;
-    min-width: 120px;
+    min-width: 130px;
     padding: 12px 16px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -130,7 +165,6 @@
   .btn-green { background: var(--green); color: #fff; }
   .btn-green:hover { background: #15803d; }
 
-  /* ============ Results ============ */
   .section-title {
     font-size: 1.1rem;
     font-weight: 700;
@@ -140,6 +174,7 @@
     border-bottom: 2px solid var(--blue-soft);
   }
 
+  /* ============ Result rows ============ */
   .result-row {
     display: flex;
     justify-content: space-between;
@@ -168,21 +203,13 @@
   .total-banner .t-label { font-weight: 600; color: #166534; font-size: 0.95rem; }
   .total-banner .t-value { font-size: 1.6rem; font-weight: 800; color: var(--green); letter-spacing: -0.02em; }
 
-  /* Pop animation whenever results refresh */
-  @keyframes pop {
-    0%   { transform: scale(0.985); opacity: 0.6; }
-    100% { transform: scale(1); opacity: 1; }
-  }
+  @keyframes pop { 0% { transform: scale(0.985); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
   .animate-pop { animation: pop 0.35s ease; }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { animation: none !important; transition: none !important; }
-  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
   .placeholder-note { color: var(--muted); font-size: 0.92rem; text-align: center; padding: 8px 0; }
   .hidden { display: none; }
 
-  /* ============ Summary ============ */
   .pay-line {
     margin-top: 16px;
     background: var(--blue-soft);
@@ -196,20 +223,100 @@
   }
   .pay-line .pay-amt { color: var(--green); }
 
+  /* ============ Multi-entry table ============ */
+  .table-wrap {
+    overflow-x: auto;            /* horizontal scroll only on narrow screens; all rows visible vertically */
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+  }
+  table.ledger { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 980px; }
+  table.ledger thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: left;
+    padding: 11px 10px;
+    white-space: nowrap;
+  }
+  table.ledger td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.ledger tbody tr:nth-child(even) { background: #f8fafc; }        /* alternate row colors */
+  table.ledger tbody tr { transition: background 0.2s ease; animation: rowIn 0.3s ease; }
+  table.ledger tbody tr:hover { background: var(--blue-soft); }
+  table.ledger tbody tr.invalid,
+  table.ledger tbody tr.invalid:nth-child(even) { background: #fee2e2; } /* light red for invalid */
+  table.ledger tbody tr.removing { opacity: 0; transform: translateX(12px); transition: opacity 0.25s ease, transform 0.25s ease; }
+  @keyframes rowIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+  table.ledger input[type="number"], table.ledger input[type="date"] {
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    border-radius: 8px;
+    min-width: 110px;
+  }
+  table.ledger input[type="number"] { min-width: 100px; }
+  .cell-calc { font-weight: 600; white-space: nowrap; }
+  .cell-sr { color: var(--muted); font-weight: 600; }
+
+  .btn-del {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .btn-del:hover { background: #fecaca; transform: translateY(-1px); }
+
+  .table-actions { margin-top: 14px; }
+
+  /* Green grand-summary box */
+  .grand-box {
+    background: var(--green-soft);
+    border: 1.5px solid #bbf7d0;
+    border-radius: 14px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .grand-box .g-item { text-align: center; }
+  .grand-box .g-label { font-size: 0.78rem; font-weight: 600; color: #166534; text-transform: uppercase; letter-spacing: 0.04em; }
+  .grand-box .g-value { font-size: 1.3rem; font-weight: 800; color: var(--ink); margin-top: 4px; }
+  .grand-box .g-item.big .g-value { color: var(--green); font-size: 1.55rem; }
+
+  /* Overall summary entries */
+  .entry-block {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .entry-block .e-title { font-weight: 700; color: var(--blue-dark); margin-bottom: 8px; font-size: 0.92rem; }
+  .entry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; font-size: 0.88rem; }
+  .entry-grid .eg-label { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .entry-grid .eg-value { font-weight: 600; margin-top: 2px; }
+  .entry-grid .eg-value.green { color: var(--green); }
+
+  .grand-lines { margin-top: 16px; background: var(--blue-soft); border-radius: 12px; padding: 14px 16px; }
+  .grand-lines .result-row { border-bottom-color: #dbeafe; }
+  .grand-lines .r-value { font-weight: 800; }
+  .grand-lines .r-value.green { color: var(--green); font-size: 1.15rem; }
+
   /* ============ Saved summaries ============ */
   .saved-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .saved-head .section-title { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+  .saved-head .section-title { margin: 0; border: none; padding: 0; }
   .btn-clear {
-    background: none;
-    border: none;
-    color: var(--danger);
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    padding: 6px 8px;
-    border-radius: 8px;
-    transition: background 0.2s ease;
+    background: none; border: none; color: var(--danger);
+    font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    padding: 6px 8px; border-radius: 8px; transition: background 0.2s ease;
   }
   .btn-clear:hover { background: var(--danger-soft); }
 
@@ -233,24 +340,71 @@
   .s-load { color: var(--blue); }
   .s-del { color: var(--danger); }
   .s-load:hover, .s-del:hover { text-decoration: underline; }
-
+  .badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--blue-soft);
+    color: var(--blue-dark);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
   .storage-note { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
 
-  /* ============ Print: only the Summary card ============ */
+  /* ============ Print ============ */
   @media print {
     body { background: #fff; padding: 0; }
     body * { visibility: hidden; }
-    #summaryCard, #summaryCard * { visibility: visible; }
-    #summaryCard {
-      position: absolute;
-      left: 0; top: 0; width: 100%;
-      box-shadow: none;
-      border: 1px solid #ccc;
-    }
-    #summaryCard .no-print { display: none !important; }
+    /* Single mode prints the single Summary card */
+    body:not(.print-multi) #summaryCard, body:not(.print-multi) #summaryCard * { visibility: visible; }
+    body:not(.print-multi) #summaryCard { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: 1px solid #ccc; }
+    /* Multi mode prints the Overall Summary card (name + entries + grand totals) */
+    body.print-multi #overallCard, body.print-multi #overallCard * { visibility: visible; }
+    body.print-multi #overallCard { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: 1px solid #ccc; }
+    .no-print { display: none !important; }
   }
 
-  /* ============ Mobile ============ */
+  /* ============ Mobile: ledger table becomes cards ============ */
+  @media (max-width: 720px) {
+    .table-wrap { border: none; max-height: none; overflow: visible; }
+    table.ledger { min-width: 0; display: block; }
+    table.ledger thead { display: none; }
+    table.ledger tbody { display: block; }
+    table.ledger tbody tr {
+      display: block;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      background: #fff !important;
+    }
+    table.ledger tbody tr.invalid { background: #fee2e2 !important; border-color: #fca5a5; }
+    table.ledger td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      padding: 6px 2px;
+    }
+    table.ledger td::before {
+      content: attr(data-label);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    table.ledger td input { max-width: 60%; }
+    table.ledger td.cell-action { justify-content: flex-end; }
+    table.ledger td.cell-action::before { content: none; }
+  }
+
   @media (max-width: 480px) {
     .card { padding: 22px 18px; }
     .app-header h1 { font-size: 1.35rem; }
@@ -264,82 +418,165 @@
 <body>
 <div class="wrap">
 
-  <!-- ============ Title card + form ============ -->
+  <!-- ============ Header with mode tabs ============ -->
   <div class="card app-header">
     <h1>Daily Interest Calculator</h1>
     <p>Interest rule: ₹1 per day for every ₹1,500 of principal</p>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab-btn active" id="tabSingle" role="tab">Single Entry</button>
+      <button type="button" class="tab-btn" id="tabMulti" role="tab">Multiple Entries</button>
+    </div>
   </div>
 
-  <div class="card">
-    <div id="errorBox" class="error-box" role="alert"></div>
+  <!-- ==================================================== -->
+  <!-- MODE 1: SINGLE ENTRY (unchanged functionality)       -->
+  <!-- ==================================================== -->
+  <div class="mode active" id="modeSingle">
+    <div class="narrow">
 
-    <div class="field">
-      <label for="personName">Person Name <span class="optional">(optional)</span></label>
-      <input type="text" id="personName" placeholder="Enter person's name" autocomplete="name" />
+      <div class="card">
+        <div id="errorBox" class="error-box" role="alert"></div>
+
+        <div class="field">
+          <label for="personName">Person Name <span class="optional">(optional)</span></label>
+          <input type="text" id="personName" placeholder="Enter person's name" autocomplete="name" />
+        </div>
+
+        <div class="field">
+          <label for="amount">Amount (₹)</label>
+          <input type="number" id="amount" placeholder="60000" min="0" inputmode="decimal" />
+        </div>
+
+        <div class="field">
+          <label for="fromDate">From Date</label>
+          <input type="date" id="fromDate" />
+        </div>
+
+        <div class="field">
+          <label for="toDate">To Date</label>
+          <div class="date-row">
+            <input type="date" id="toDate" />
+            <button type="button" class="btn-today" id="todayBtn">Use Today's Date</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="calcBtn">Calculate</button>
+          <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
+          <button type="button" class="btn btn-ghost" id="printBtn">Print Summary</button>
+        </div>
+      </div>
+
+      <div class="card" id="resultsCard">
+        <div class="section-title">Calculation Results</div>
+        <div id="resultsEmpty" class="placeholder-note">Fill in the amount and dates to see the calculation.</div>
+        <div id="resultsBody" class="hidden">
+          <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="rRange"></span></div>
+          <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="rDays"></span></div>
+          <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="rDaily"></span></div>
+          <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="rInterest"></span></div>
+          <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="rPrincipal"></span></div>
+          <div class="total-banner">
+            <span class="t-label">Total Amount Payable</span>
+            <span class="t-value" id="rTotal"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="summaryCard">
+        <div class="section-title">Summary</div>
+        <div id="summaryEmpty" class="placeholder-note">The summary appears here after a valid calculation.</div>
+        <div id="summaryBody" class="hidden">
+          <div class="result-row"><span class="r-label">Person Name</span><span class="r-value" id="sName"></span></div>
+          <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="sPrincipal"></span></div>
+          <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="sRange"></span></div>
+          <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="sDays"></span></div>
+          <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="sDaily"></span></div>
+          <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="sInterest"></span></div>
+          <div class="result-row"><span class="r-label">Total Amount Payable</span><span class="r-value" id="sTotal"></span></div>
+          <div class="pay-line" id="payLine"></div>
+          <div class="btn-row no-print" style="margin-top:16px;">
+            <button type="button" class="btn btn-green" id="saveBtn">Save Summary</button>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <div class="field">
-      <label for="amount">Amount (₹)</label>
-      <input type="number" id="amount" placeholder="60000" min="0" inputmode="decimal" />
-    </div>
+  <!-- ==================================================== -->
+  <!-- MODE 2: MULTIPLE ENTRIES                              -->
+  <!-- ==================================================== -->
+  <div class="mode" id="modeMulti">
 
-    <div class="field">
-      <label for="fromDate">From Date</label>
-      <input type="date" id="fromDate" />
-    </div>
+    <div class="card">
+      <div class="section-title">Multiple Loan Entry Calculator</div>
 
-    <div class="field">
-      <label for="toDate">To Date</label>
-      <div class="date-row">
-        <input type="date" id="toDate" />
-        <button type="button" class="btn-today" id="todayBtn">Use Today's Date</button>
+      <div class="field">
+        <label for="multiName">Person Name <span class="optional">(optional)</span></label>
+        <input type="text" id="multiName" placeholder="Enter person's name" autocomplete="name" />
+      </div>
+
+      <div class="table-wrap">
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th>Sr.</th>
+              <th>Amount (₹)</th>
+              <th>From Date</th>
+              <th>To Date</th>
+              <th>Days</th>
+              <th>Duration</th>
+              <th>1 Day Interest</th>
+              <th>Total Interest</th>
+              <th>Total Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+      </div>
+
+      <div class="btn-row table-actions">
+        <button type="button" class="btn btn-primary" id="addRowBtn">+ Add New Entry</button>
       </div>
     </div>
 
-    <div class="btn-row">
-      <button type="button" class="btn btn-primary" id="calcBtn">Calculate</button>
-      <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
-      <button type="button" class="btn btn-ghost" id="printBtn">Print Summary</button>
-    </div>
-  </div>
-
-  <!-- ============ Results card ============ -->
-  <div class="card" id="resultsCard">
-    <div class="section-title">Calculation Results</div>
-    <div id="resultsEmpty" class="placeholder-note">Fill in the amount and dates to see the calculation.</div>
-    <div id="resultsBody" class="hidden">
-      <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="rRange"></span></div>
-      <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="rDays"></span></div>
-      <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="rDaily"></span></div>
-      <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="rInterest"></span></div>
-      <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="rPrincipal"></span></div>
-      <div class="total-banner">
-        <span class="t-label">Total Amount Payable</span>
-        <span class="t-value" id="rTotal"></span>
+    <!-- Grand summary (green box) -->
+    <div class="card" id="grandCard">
+      <div class="section-title">Grand Summary</div>
+      <div class="grand-box" id="grandBox">
+        <div class="g-item"><div class="g-label">Total Entries</div><div class="g-value" id="gEntries">0 Entries</div></div>
+        <div class="g-item"><div class="g-label">Total Principal</div><div class="g-value" id="gPrincipal">₹0</div></div>
+        <div class="g-item"><div class="g-label">Total Interest</div><div class="g-value" id="gInterest">₹0</div></div>
+        <div class="g-item big"><div class="g-label">Grand Total Payable</div><div class="g-value" id="gTotal">₹0</div></div>
       </div>
     </div>
-  </div>
 
-  <!-- ============ Summary card (printable) ============ -->
-  <div class="card" id="summaryCard">
-    <div class="section-title">Summary</div>
-    <div id="summaryEmpty" class="placeholder-note">The summary appears here after a valid calculation.</div>
-    <div id="summaryBody" class="hidden">
-      <div class="result-row"><span class="r-label">Person Name</span><span class="r-value" id="sName"></span></div>
-      <div class="result-row"><span class="r-label">Principal Amount</span><span class="r-value" id="sPrincipal"></span></div>
-      <div class="result-row"><span class="r-label">Date Range</span><span class="r-value" id="sRange"></span></div>
-      <div class="result-row"><span class="r-label">Total Days</span><span class="r-value" id="sDays"></span></div>
-      <div class="result-row"><span class="r-label">One Day Interest</span><span class="r-value" id="sDaily"></span></div>
-      <div class="result-row"><span class="r-label">Total Interest</span><span class="r-value" id="sInterest"></span></div>
-      <div class="result-row"><span class="r-label">Total Amount Payable</span><span class="r-value" id="sTotal"></span></div>
-      <div class="pay-line" id="payLine"></div>
-      <div class="btn-row no-print" style="margin-top:16px;">
-        <button type="button" class="btn btn-green" id="saveBtn">Save Summary</button>
+    <!-- Overall summary (printable: name + all entries + grand totals) -->
+    <div class="card" id="overallCard">
+      <div class="section-title">Overall Summary</div>
+      <div id="overallEmpty" class="placeholder-note">Add valid entries to see the overall summary.</div>
+      <div id="overallBody" class="hidden">
+        <div class="result-row"><span class="r-label">Person Name</span><span class="r-value" id="oName">—</span></div>
+        <div style="margin-top:12px;" id="overallEntries"></div>
+        <div class="grand-lines">
+          <div class="result-row"><span class="r-label">Grand Total Principal</span><span class="r-value" id="oPrincipal"></span></div>
+          <div class="result-row"><span class="r-label">Grand Total Interest</span><span class="r-value" id="oInterest"></span></div>
+          <div class="result-row"><span class="r-label">Grand Total Payable</span><span class="r-value green" id="oTotal"></span></div>
+        </div>
+        <div class="btn-row no-print" style="margin-top:16px;">
+          <button type="button" class="btn btn-green" id="multiSaveBtn">Save Summary</button>
+          <button type="button" class="btn btn-ghost" id="exportPdfBtn">Export PDF</button>
+          <button type="button" class="btn btn-ghost" id="exportExcelBtn">Export Excel</button>
+          <button type="button" class="btn btn-ghost" id="multiPrintBtn">Print</button>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <!-- ============ Saved summaries card ============ -->
+  <!-- ============ Saved summaries (shared) ============ -->
   <div class="card" id="savedCard">
     <div class="saved-head">
       <div class="section-title">Saved Summaries</div>
@@ -356,57 +593,73 @@
 (function () {
   "use strict";
 
-  /* ==================== Element references ==================== */
+  /* ==================== Shared helpers ==================== */
   const el = (id) => document.getElementById(id);
-  const nameInput  = el("personName");
-  const amountInput = el("amount");
-  const fromInput  = el("fromDate");
-  const toInput    = el("toDate");
-  const errorBox   = el("errorBox");
-
-  const resultsCard  = el("resultsCard");
-  const resultsBody  = el("resultsBody");
-  const resultsEmpty = el("resultsEmpty");
-  const summaryBody  = el("summaryBody");
-  const summaryEmpty = el("summaryEmpty");
-  const savedList    = el("savedList");
-  const savedEmpty   = el("savedEmpty");
-
   const STORAGE_KEY = "interest-calculator-summaries";
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const RATE_DIVISOR = 1500;          /* One-day interest = amount / 1500 */
 
-  /* Holds the last valid calculation (used by Save Summary) */
-  let lastResult = null;
-
-  /* ==================== Formatting helpers ==================== */
-
-  /* Indian locale currency: 60000 -> ₹60,000.00 */
   function formatINR(value, decimals = 2) {
-    return "₹" + value.toLocaleString("en-IN", {
+    return "\u20B9" + value.toLocaleString("en-IN", {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
   }
-
-  /* Date object -> "1 January 2025" */
   function formatDate(date) {
     return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
   }
-
-  /* Today's date as yyyy-mm-dd for the date input (local time, not UTC) */
   function todayISO() {
     const d = new Date();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return d.getFullYear() + "-" + m + "-" + day;
+    return d.getFullYear() + "-" +
+      String(d.getMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getDate()).padStart(2, "0");
   }
-
-  /* Parse yyyy-mm-dd into a local-midnight Date to avoid timezone drift */
   function parseISO(str) {
     const [y, m, d] = str.split("-").map(Number);
     return new Date(y, m - 1, d);
   }
+  function daysBetween(fromISO, toISO) {
+    return Math.round((parseISO(toISO) - parseISO(fromISO)) / MS_PER_DAY);
+  }
 
-  /* ==================== Storage (localStorage with in-memory fallback) ==================== */
+  /* Add n calendar months, clamping the day to the target month's length
+     (e.g. 31 Jan + 1 month = 28 Feb, not 3 Mar) */
+  function addMonthsClamped(date, n) {
+    const y = date.getFullYear();
+    const m = date.getMonth() + n;
+    const lastDay = new Date(y, m + 1, 0).getDate();
+    return new Date(y, m, Math.min(date.getDate(), lastDay));
+  }
+
+  /* Calendar breakdown of a date range: e.g. "1 Year 13 Days" */
+  function durationText(fromISO, toISO) {
+    const from = parseISO(fromISO);
+    const to = parseISO(toISO);
+    /* whole calendar months that fit inside the range */
+    let months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+    if (addMonthsClamped(from, months) > to) months--;
+    const anchor = addMonthsClamped(from, months);
+    const days = Math.round((to - anchor) / MS_PER_DAY);
+    const years = Math.floor(months / 12);
+    months = months % 12;
+    const parts = [];
+    if (years) parts.push(years + (years === 1 ? " Year" : " Years"));
+    if (months) parts.push(months + (months === 1 ? " Month" : " Months"));
+    if (days) parts.push(days + (days === 1 ? " Day" : " Days"));
+    return parts.length ? parts.join(" ") : "0 Days";
+  }
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  function animate(node) {
+    node.classList.remove("animate-pop");
+    void node.offsetWidth;
+    node.classList.add("animate-pop");
+  }
+
+  /* ==================== Storage (localStorage + in-memory fallback) ==================== */
   let memoryStore = [];
   let storageAvailable = true;
   try {
@@ -417,95 +670,76 @@
     el("storageNote").textContent =
       "Note: browser storage is unavailable here, so saved summaries last only for this session. Open the file directly in your browser to keep them permanently.";
   }
-
   function loadSaved() {
     if (!storageAvailable) return memoryStore;
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    } catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (e) { return []; }
   }
-
   function persistSaved(items) {
     if (!storageAvailable) { memoryStore = items; return; }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (e) { /* quota or privacy mode: silently keep in memory */ memoryStore = items; storageAvailable = false; }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+    catch (e) { memoryStore = items; storageAvailable = false; }
   }
 
-  /* ==================== Validation ==================== */
-  function showError(msg) {
-    errorBox.textContent = msg;
-    errorBox.classList.add("show");
+  /* ==================== Tabs ==================== */
+  const tabSingle = el("tabSingle");
+  const tabMulti = el("tabMulti");
+  function setMode(mode) {
+    const single = mode === "single";
+    tabSingle.classList.toggle("active", single);
+    tabMulti.classList.toggle("active", !single);
+    el("modeSingle").classList.toggle("active", single);
+    el("modeMulti").classList.toggle("active", !single);
+    document.body.classList.toggle("print-multi", !single); /* controls what Print outputs */
   }
-  function clearError() {
-    errorBox.textContent = "";
-    errorBox.classList.remove("show");
-  }
+  tabSingle.addEventListener("click", () => setMode("single"));
+  tabMulti.addEventListener("click", () => setMode("multi"));
 
-  /* Returns {amount, from, to} if valid, otherwise null (and shows the error) */
-  function validate(showMessages) {
+  /* ============================================================
+     MODE 1: SINGLE ENTRY  (existing behaviour, unchanged)
+     ============================================================ */
+  const nameInput = el("personName");
+  const amountInput = el("amount");
+  const fromInput = el("fromDate");
+  const toInput = el("toDate");
+  const errorBox = el("errorBox");
+  const resultsBody = el("resultsBody");
+  const resultsEmpty = el("resultsEmpty");
+  const summaryBody = el("summaryBody");
+  const summaryEmpty = el("summaryEmpty");
+  let lastResult = null;
+
+  function showError(msg) { errorBox.textContent = msg; errorBox.classList.add("show"); }
+  function clearError() { errorBox.textContent = ""; errorBox.classList.remove("show"); }
+
+  function validateSingle(showMessages) {
     const amountRaw = amountInput.value.trim();
-    const fromRaw = fromInput.value;
-    const toRaw = toInput.value;
-
-    if (amountRaw === "") {
-      if (showMessages) showError("Please enter amount.");
-      return null;
-    }
+    if (amountRaw === "") { if (showMessages) showError("Please enter amount."); return null; }
     const amount = Number(amountRaw);
-    if (!isFinite(amount) || amount <= 0) {
-      if (showMessages) showError("Amount must be a positive number.");
-      return null;
-    }
-    if (fromRaw === "") {
-      if (showMessages) showError("Please select start date.");
-      return null;
-    }
-    if (toRaw === "") {
-      if (showMessages) showError("Please select end date.");
-      return null;
-    }
-    const from = parseISO(fromRaw);
-    const to = parseISO(toRaw);
-    if (from > to) {
-      if (showMessages) showError("From Date cannot be greater than To Date.");
-      return null;
-    }
+    if (!isFinite(amount) || amount <= 0) { if (showMessages) showError("Amount must be a positive number."); return null; }
+    if (fromInput.value === "") { if (showMessages) showError("Please select start date."); return null; }
+    if (toInput.value === "") { if (showMessages) showError("Please select end date."); return null; }
+    const from = parseISO(fromInput.value);
+    const to = parseISO(toInput.value);
+    if (from > to) { if (showMessages) showError("From Date cannot be greater than To Date."); return null; }
     clearError();
     return { amount, from, to };
   }
 
-  /* ==================== Calculation ==================== */
-  function compute(inputs) {
-    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  function computeSingle(inputs) {
     const days = Math.round((inputs.to - inputs.from) / MS_PER_DAY);
-    const oneDayInterest = inputs.amount / 1500;          /* ₹1 per day per ₹1500 */
+    const oneDayInterest = inputs.amount / RATE_DIVISOR;
     const totalInterest = days * oneDayInterest;
-    const totalPayable = inputs.amount + totalInterest;
     return {
       name: nameInput.value.trim(),
-      amount: inputs.amount,
-      from: inputs.from,
-      to: inputs.to,
-      days,
-      oneDayInterest,
-      totalInterest,
-      totalPayable
+      amount: inputs.amount, from: inputs.from, to: inputs.to,
+      days, oneDayInterest, totalInterest,
+      totalPayable: inputs.amount + totalInterest
     };
   }
 
-  /* ==================== Rendering ==================== */
-  function animate(node) {
-    node.classList.remove("animate-pop");
-    /* force reflow so the animation replays */
-    void node.offsetWidth;
-    node.classList.add("animate-pop");
-  }
-
-  function render(r) {
+  function renderSingle(r) {
     lastResult = r;
-
-    /* Results card */
     resultsEmpty.classList.add("hidden");
     resultsBody.classList.remove("hidden");
     el("rRange").textContent = formatDate(r.from) + " \u2192 " + formatDate(r.to);
@@ -516,7 +750,6 @@
     el("rTotal").textContent = formatINR(r.totalPayable);
     animate(resultsBody);
 
-    /* Summary card */
     summaryEmpty.classList.add("hidden");
     summaryBody.classList.remove("hidden");
     el("sName").textContent = r.name || "\u2014";
@@ -526,19 +759,16 @@
     el("sDaily").textContent = formatINR(r.oneDayInterest);
     el("sInterest").textContent = formatINR(r.totalInterest);
     el("sTotal").textContent = formatINR(r.totalPayable);
-
     const pay = el("payLine");
     if (r.name) {
-      pay.innerHTML = "Pay by " + escapeHTML(r.name) +
-        " \u2192 <span class='pay-amt'>" + formatINR(r.totalPayable, 0) + "</span>";
+      pay.innerHTML = "Pay by " + escapeHTML(r.name) + " \u2192 <span class='pay-amt'>" + formatINR(r.totalPayable, 0) + "</span>";
     } else {
-      pay.innerHTML = "Total Amount Payable \u2192 <span class='pay-amt'>" +
-        formatINR(r.totalPayable, 0) + "</span>";
+      pay.innerHTML = "Total Amount Payable \u2192 <span class='pay-amt'>" + formatINR(r.totalPayable, 0) + "</span>";
     }
     animate(summaryBody);
   }
 
-  function clearResults() {
+  function clearSingleResults() {
     lastResult = null;
     resultsBody.classList.add("hidden");
     resultsEmpty.classList.remove("hidden");
@@ -546,87 +776,32 @@
     summaryEmpty.classList.remove("hidden");
   }
 
-  function escapeHTML(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
+  function recalcSingle(showMessages) {
+    const inputs = validateSingle(showMessages);
+    if (!inputs) { if (!showMessages) clearSingleResults(); return; }
+    renderSingle(computeSingle(inputs));
   }
 
-  /* showMessages=false for silent live updates while typing */
-  function recalculate(showMessages) {
-    const inputs = validate(showMessages);
-    if (!inputs) {
-      if (!showMessages) clearResults();
-      return;
-    }
-    render(compute(inputs));
-  }
-
-  /* ==================== Saved summaries ==================== */
-  function renderSaved() {
-    const items = loadSaved();
-    savedList.innerHTML = "";
-    savedEmpty.classList.toggle("hidden", items.length > 0);
-    el("clearAllBtn").style.display = items.length > 0 ? "" : "none";
-
-    items.forEach((item, idx) => {
-      const div = document.createElement("div");
-      div.className = "saved-item";
-
-      const top = document.createElement("div");
-      top.className = "s-top";
-      const nm = document.createElement("span");
-      nm.className = "s-name";
-      nm.textContent = item.name || "Unnamed";
-      const amt = document.createElement("span");
-      amt.className = "s-amt";
-      amt.textContent = formatINR(item.totalPayable, 0);
-      top.append(nm, amt);
-
-      const meta = document.createElement("div");
-      meta.className = "s-meta";
-      meta.textContent =
-        "Principal " + formatINR(item.amount, 0) + " \u00b7 " +
-        formatDate(parseISO(item.fromISO)) + " to " + formatDate(parseISO(item.toISO)) +
-        " \u00b7 " + item.days.toLocaleString("en-IN") + " days" +
-        " \u00b7 Interest " + formatINR(item.totalInterest, 0) +
-        " \u00b7 Saved " + formatDate(new Date(item.savedAt));
-
-      const actions = document.createElement("div");
-      actions.className = "s-actions";
-      const loadBtn = document.createElement("button");
-      loadBtn.className = "s-load";
-      loadBtn.textContent = "Load";
-      loadBtn.addEventListener("click", () => loadEntry(item));
-      const delBtn = document.createElement("button");
-      delBtn.className = "s-del";
-      delBtn.textContent = "Delete";
-      delBtn.addEventListener("click", () => {
-        const list = loadSaved();
-        list.splice(idx, 1);
-        persistSaved(list);
-        renderSaved();
-      });
-      actions.append(loadBtn, delBtn);
-
-      div.append(top, meta, actions);
-      savedList.appendChild(div);
-    });
-  }
-
-  function loadEntry(item) {
-    nameInput.value = item.name || "";
-    amountInput.value = item.amount;
-    fromInput.value = item.fromISO;
-    toInput.value = item.toISO;
-    recalculate(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function saveCurrent() {
+  [nameInput, amountInput, fromInput, toInput].forEach((input) => {
+    input.addEventListener("input", () => recalcSingle(false));
+    input.addEventListener("change", () => recalcSingle(false));
+  });
+  el("calcBtn").addEventListener("click", () => recalcSingle(true));
+  el("resetBtn").addEventListener("click", () => {
+    nameInput.value = ""; amountInput.value = ""; fromInput.value = "";
+    toInput.value = todayISO();
+    clearError(); clearSingleResults(); nameInput.focus();
+  });
+  el("printBtn").addEventListener("click", () => {
+    if (!lastResult) { recalcSingle(true); if (!lastResult) return; }
+    window.print();
+  });
+  el("todayBtn").addEventListener("click", () => { toInput.value = todayISO(); recalcSingle(false); });
+  el("saveBtn").addEventListener("click", () => {
     if (!lastResult) return;
     const items = loadSaved();
     items.unshift({
+      type: "single",
       name: lastResult.name,
       amount: lastResult.amount,
       fromISO: fromInput.value,
@@ -638,62 +813,437 @@
       savedAt: Date.now()
     });
     persistSaved(items);
-    renderSaved();
+    renderSavedList();
+  });
+
+  /* ============================================================
+     MODE 2: MULTIPLE ENTRIES (loan ledger)
+     ============================================================ */
+  const ledgerBody = el("ledgerBody");
+  const multiName = el("multiName");
+  let rows = [];        /* [{id, amount:'', fromISO:'', toISO:''}] */
+  let rowSeq = 0;
+
+  /* Compute one row; returns null when the row is invalid/incomplete */
+  function computeRow(row) {
+    const amount = Number(row.amount);
+    if (row.amount === "" || !isFinite(amount) || amount <= 0) return null;
+    if (!row.fromISO || !row.toISO) return null;
+    const days = daysBetween(row.fromISO, row.toISO);
+    if (days < 0) return null;                       /* To Date earlier than From Date */
+    const oneDay = amount / RATE_DIVISOR;
+    const interest = days * oneDay;
+    return {
+      amount, days, oneDay, interest,
+      duration: durationText(row.fromISO, row.toISO),
+      total: amount + interest
+    };
   }
 
-  /* ==================== Events ==================== */
+  function addRow(preset) {
+    const row = {
+      id: ++rowSeq,
+      amount: preset ? String(preset.amount) : "",
+      fromISO: preset ? preset.fromISO : "",
+      toISO: preset ? preset.toISO : todayISO()      /* new rows default To Date to today */
+    };
+    rows.push(row);
 
-  /* Live auto-calculation on every input change (silent validation) */
-  [nameInput, amountInput, fromInput, toInput].forEach((input) => {
-    input.addEventListener("input", () => recalculate(false));
-    input.addEventListener("change", () => recalculate(false));
-  });
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
 
-  /* Enter key triggers a full calculate with messages */
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && e.target.tagName === "INPUT") {
-      e.preventDefault();
-      recalculate(true);
+    /* Sr. */
+    const tdSr = document.createElement("td");
+    tdSr.className = "cell-sr";
+    tdSr.dataset.label = "Sr.";
+    tr.appendChild(tdSr);
+
+    /* Amount */
+    const tdAmt = document.createElement("td");
+    tdAmt.dataset.label = "Amount";
+    const amt = document.createElement("input");
+    amt.type = "number"; amt.min = "0"; amt.placeholder = "60000"; amt.inputMode = "decimal";
+    amt.value = row.amount;
+    amt.addEventListener("input", () => { row.amount = amt.value; refreshRow(row, tr); });
+    tdAmt.appendChild(amt);
+    tr.appendChild(tdAmt);
+
+    /* From Date */
+    const tdFrom = document.createElement("td");
+    tdFrom.dataset.label = "From Date";
+    const from = document.createElement("input");
+    from.type = "date"; from.value = row.fromISO;
+    from.addEventListener("change", () => { row.fromISO = from.value; refreshRow(row, tr); });
+    from.addEventListener("input", () => { row.fromISO = from.value; refreshRow(row, tr); });
+    tdFrom.appendChild(from);
+    tr.appendChild(tdFrom);
+
+    /* To Date */
+    const tdTo = document.createElement("td");
+    tdTo.dataset.label = "To Date";
+    const to = document.createElement("input");
+    to.type = "date"; to.value = row.toISO;
+    to.addEventListener("change", () => { row.toISO = to.value; refreshRow(row, tr); });
+    to.addEventListener("input", () => { row.toISO = to.value; refreshRow(row, tr); });
+    tdTo.appendChild(to);
+    tr.appendChild(tdTo);
+
+    /* Calculated cells */
+    ["Days", "Duration", "1 Day Interest", "Total Interest", "Total Amount"].forEach((label) => {
+      const td = document.createElement("td");
+      td.className = "cell-calc";
+      td.dataset.label = label;
+      td.textContent = "\u2014";
+      tr.appendChild(td);
+    });
+
+    /* Delete */
+    const tdAct = document.createElement("td");
+    tdAct.className = "cell-action";
+    tdAct.dataset.label = "Action";
+    const del = document.createElement("button");
+    del.type = "button"; del.className = "btn-del"; del.textContent = "Delete";
+    del.addEventListener("click", () => {
+      tr.classList.add("removing");                  /* smooth removal animation */
+      setTimeout(() => {
+        rows = rows.filter((r) => r.id !== row.id);
+        tr.remove();
+        renumber();
+        updateMultiTotals();
+      }, 250);
+    });
+    tdAct.appendChild(del);
+    tr.appendChild(tdAct);
+
+    ledgerBody.appendChild(tr);
+    renumber();
+    refreshRow(row, tr);
+    return tr;
+  }
+
+  function renumber() {
+    Array.from(ledgerBody.children).forEach((tr, i) => {
+      tr.firstChild.textContent = i + 1;             /* auto serial numbering */
+    });
+  }
+
+  /* Recalculate one row's computed cells, then the grand totals */
+  function refreshRow(row, tr) {
+    const calc = computeRow(row);
+    const cells = tr.querySelectorAll(".cell-calc");
+    const touched = row.amount !== "" || row.fromISO !== "";
+    tr.classList.toggle("invalid", !calc && touched); /* light-red highlight for invalid rows */
+    if (calc) {
+      cells[0].textContent = calc.days.toLocaleString("en-IN");
+      cells[1].textContent = calc.duration;
+      cells[2].textContent = formatINR(calc.oneDay);
+      cells[3].textContent = formatINR(calc.interest);
+      cells[4].textContent = formatINR(calc.total);
+    } else {
+      cells.forEach((c) => (c.textContent = "\u2014"));
     }
-  });
+    updateMultiTotals();
+  }
 
-  el("calcBtn").addEventListener("click", () => recalculate(true));
+  /* Grand summary + Overall Summary cards */
+  function updateMultiTotals() {
+    const valid = [];
+    rows.forEach((row) => {
+      const calc = computeRow(row);
+      if (calc) valid.push({ row, calc });
+    });
 
-  el("resetBtn").addEventListener("click", () => {
-    nameInput.value = "";
-    amountInput.value = "";
-    fromInput.value = "";
-    toInput.value = todayISO();   /* To Date defaults back to today */
-    clearError();
-    clearResults();
-    nameInput.focus();
-  });
+    const principal = valid.reduce((s, v) => s + v.calc.amount, 0);
+    const interest = valid.reduce((s, v) => s + v.calc.interest, 0);
+    const total = principal + interest;
 
-  el("printBtn").addEventListener("click", () => {
-    if (!lastResult) {
-      recalculate(true);          /* surface the validation message instead */
-      if (!lastResult) return;
+    el("gEntries").textContent = valid.length.toLocaleString("en-IN") + (valid.length === 1 ? " Entry" : " Entries");
+    el("gPrincipal").textContent = formatINR(principal, 0);
+    el("gInterest").textContent = formatINR(interest, 0);
+    el("gTotal").textContent = formatINR(total, 0);
+    animate(el("grandBox"));
+
+    const overallBody = el("overallBody");
+    const overallEmpty = el("overallEmpty");
+    if (valid.length === 0) {
+      overallBody.classList.add("hidden");
+      overallEmpty.classList.remove("hidden");
+      return;
     }
-    window.print();
+    overallEmpty.classList.add("hidden");
+    overallBody.classList.remove("hidden");
+    el("oName").textContent = multiName.value.trim() || "\u2014";
+
+    const container = el("overallEntries");
+    container.innerHTML = "";
+    valid.forEach((v, i) => {
+      const block = document.createElement("div");
+      block.className = "entry-block";
+      const range = formatDate(parseISO(v.row.fromISO)) + " \u2193 " + formatDate(parseISO(v.row.toISO));
+      block.innerHTML =
+        "<div class='e-title'>Entry " + (i + 1) + "</div>" +
+        "<div class='entry-grid'>" +
+          "<div><div class='eg-label'>Amount</div><div class='eg-value'>" + formatINR(v.calc.amount, 0) + "</div></div>" +
+          "<div><div class='eg-label'>Date Range</div><div class='eg-value'>" + range + "</div></div>" +
+          "<div><div class='eg-label'>Days</div><div class='eg-value'>" + v.calc.days.toLocaleString("en-IN") + "</div></div>" +
+          "<div><div class='eg-label'>Duration</div><div class='eg-value'>" + v.calc.duration + "</div></div>" +
+          "<div><div class='eg-label'>Interest</div><div class='eg-value'>" + formatINR(v.calc.interest, 0) + "</div></div>" +
+          "<div><div class='eg-label'>Total</div><div class='eg-value green'>" + formatINR(v.calc.total, 0) + "</div></div>" +
+        "</div>";
+      container.appendChild(block);
+    });
+
+    el("oPrincipal").textContent = formatINR(principal, 0);
+    el("oInterest").textContent = formatINR(interest, 0);
+    el("oTotal").textContent = formatINR(total, 0);
+    animate(overallBody);
+  }
+
+  multiName.addEventListener("input", () => {
+    el("oName").textContent = multiName.value.trim() || "\u2014";
   });
 
-  el("todayBtn").addEventListener("click", () => {
-    toInput.value = todayISO();
-    recalculate(false);
+  el("addRowBtn").addEventListener("click", () => {
+    const tr = addRow();
+    tr.querySelector("input[type='number']").focus();
   });
 
-  el("saveBtn").addEventListener("click", saveCurrent);
+  /* --------- Snapshot of valid entries (used by save/export/print) --------- */
+  function multiSnapshot() {
+    const entries = [];
+    rows.forEach((row) => {
+      const calc = computeRow(row);
+      if (calc) {
+        entries.push({
+          amount: calc.amount, fromISO: row.fromISO, toISO: row.toISO,
+          days: calc.days, duration: calc.duration, oneDayInterest: calc.oneDay,
+          totalInterest: calc.interest, totalPayable: calc.total
+        });
+      }
+    });
+    const principal = entries.reduce((s, e) => s + e.amount, 0);
+    const interest = entries.reduce((s, e) => s + e.totalInterest, 0);
+    return {
+      name: multiName.value.trim(),
+      entries,
+      totalPrincipal: principal,
+      totalInterest: interest,
+      grandTotal: principal + interest
+    };
+  }
+
+  /* --------- Save / load multi summaries --------- */
+  el("multiSaveBtn").addEventListener("click", () => {
+    const snap = multiSnapshot();
+    if (snap.entries.length === 0) return;
+    const items = loadSaved();
+    items.unshift({
+      type: "multi",
+      name: snap.name,
+      entries: snap.entries,                 /* every entry, restored exactly on load */
+      entryCount: snap.entries.length,
+      totalPrincipal: snap.totalPrincipal,
+      totalInterest: snap.totalInterest,
+      totalPayable: snap.grandTotal,
+      savedAt: Date.now()                    /* date created */
+    });
+    persistSaved(items);
+    renderSavedList();
+  });
+
+  function loadMultiEntry(item) {
+    setMode("multi");
+    multiName.value = item.name || "";
+    rows = [];
+    ledgerBody.innerHTML = "";
+    (item.entries || []).forEach((e) => addRow({ amount: e.amount, fromISO: e.fromISO, toISO: e.toISO }));
+    updateMultiTotals();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* --------- Print (multi): person name + entries + grand summary only --------- */
+  el("multiPrintBtn").addEventListener("click", () => {
+    const snap = multiSnapshot();
+    if (snap.entries.length === 0) return;
+    window.print();                          /* body.print-multi CSS limits output to Overall Summary */
+  });
+
+  /* --------- Export helpers --------- */
+  function buildExportTableHTML(snap) {
+    let rowsHTML = "";
+    snap.entries.forEach((e, i) => {
+      rowsHTML +=
+        "<tr>" +
+        "<td>" + (i + 1) + "</td>" +
+        "<td>" + formatINR(e.amount, 0) + "</td>" +
+        "<td>" + formatDate(parseISO(e.fromISO)) + "</td>" +
+        "<td>" + formatDate(parseISO(e.toISO)) + "</td>" +
+        "<td>" + e.days + "</td>" +
+        "<td>" + (e.duration || durationText(e.fromISO, e.toISO)) + "</td>" +
+        "<td>" + formatINR(e.oneDayInterest) + "</td>" +
+        "<td>" + formatINR(e.totalInterest) + "</td>" +
+        "<td>" + formatINR(e.totalPayable) + "</td>" +
+        "</tr>";
+    });
+    return (
+      "<table border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse;width:100%;font-size:13px;'>" +
+      "<thead><tr style='background:#2563eb;color:#fff;'>" +
+      "<th>Sr.</th><th>Amount</th><th>From Date</th><th>To Date</th><th>Days</th><th>Duration</th>" +
+      "<th>1 Day Interest</th><th>Total Interest</th><th>Total Amount</th></tr></thead>" +
+      "<tbody>" + rowsHTML + "</tbody>" +
+      "<tfoot>" +
+      "<tr style='background:#f0fdf4;font-weight:bold;'><td colspan='8'>Grand Total Principal</td><td>" + formatINR(snap.totalPrincipal, 0) + "</td></tr>" +
+      "<tr style='background:#f0fdf4;font-weight:bold;'><td colspan='8'>Grand Total Interest</td><td>" + formatINR(snap.totalInterest, 0) + "</td></tr>" +
+      "<tr style='background:#dcfce7;font-weight:bold;color:#166534;'><td colspan='8'>Grand Total Payable</td><td>" + formatINR(snap.grandTotal, 0) + "</td></tr>" +
+      "</tfoot></table>"
+    );
+  }
+
+  function exportDocumentHTML(snap) {
+    return (
+      "<h2 style='color:#1d4ed8;font-family:Segoe UI,Arial,sans-serif;'>Daily Interest Calculator \u2014 Loan Ledger</h2>" +
+      "<p style='font-family:Segoe UI,Arial,sans-serif;'><b>Person Name:</b> " + (escapeHTML(snap.name) || "\u2014") +
+      " &nbsp;|&nbsp; <b>Entries:</b> " + snap.entries.length +
+      " &nbsp;|&nbsp; <b>Date:</b> " + formatDate(new Date()) + "</p>" +
+      buildExportTableHTML(snap)
+    );
+  }
+
+  /* Export Excel: downloads an .xls file (HTML table format that Excel opens natively) */
+  el("exportExcelBtn").addEventListener("click", () => {
+    const snap = multiSnapshot();
+    if (snap.entries.length === 0) return;
+    const html =
+      "<html><head><meta charset='UTF-8'></head><body>" +
+      exportDocumentHTML(snap) + "</body></html>";
+    const blob = new Blob(["\uFEFF" + html], { type: "application/vnd.ms-excel;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "loan-ledger-" + todayISO() + ".xls";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  });
+
+  /* Export PDF: opens a clean print view; choose "Save as PDF" in the print dialog */
+  el("exportPdfBtn").addEventListener("click", () => {
+    const snap = multiSnapshot();
+    if (snap.entries.length === 0) return;
+    const w = window.open("", "_blank");
+    if (!w) { alert("Please allow pop-ups to export the PDF."); return; }
+    w.document.write(
+      "<html><head><meta charset='UTF-8'><title>Loan Ledger</title>" +
+      "<style>body{font-family:Segoe UI,Arial,sans-serif;padding:24px;color:#1e293b;}</style>" +
+      "</head><body>" + exportDocumentHTML(snap) +
+      "<p style='color:#64748b;font-size:12px;margin-top:16px;'>Tip: choose \u201CSave as PDF\u201D as the destination in the print dialog.</p>" +
+      "</body></html>"
+    );
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 300);
+  });
+
+  /* ============================================================
+     SAVED SUMMARIES LIST (shared between both modes)
+     ============================================================ */
+  const savedList = el("savedList");
+  const savedEmpty = el("savedEmpty");
+
+  function renderSavedList() {
+    const items = loadSaved();
+    savedList.innerHTML = "";
+    savedEmpty.classList.toggle("hidden", items.length > 0);
+    el("clearAllBtn").style.display = items.length > 0 ? "" : "none";
+
+    items.forEach((item, idx) => {
+      const isMulti = item.type === "multi";
+      const div = document.createElement("div");
+      div.className = "saved-item";
+
+      const top = document.createElement("div");
+      top.className = "s-top";
+      const nm = document.createElement("span");
+      nm.className = "s-name";
+      nm.textContent = item.name || "Unnamed";
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = isMulti ? item.entryCount + " entries" : "single";
+      nm.appendChild(badge);
+      const amt = document.createElement("span");
+      amt.className = "s-amt";
+      amt.textContent = formatINR(item.totalPayable, 0);
+      top.append(nm, amt);
+
+      const meta = document.createElement("div");
+      meta.className = "s-meta";
+      if (isMulti) {
+        meta.textContent =
+          "Principal " + formatINR(item.totalPrincipal, 0) +
+          " \u00b7 Interest " + formatINR(item.totalInterest, 0) +
+          " \u00b7 " + item.entryCount + (item.entryCount === 1 ? " entry" : " entries") +
+          " \u00b7 Saved " + formatDate(new Date(item.savedAt));
+      } else {
+        meta.textContent =
+          "Principal " + formatINR(item.amount, 0) + " \u00b7 " +
+          formatDate(parseISO(item.fromISO)) + " to " + formatDate(parseISO(item.toISO)) +
+          " \u00b7 " + item.days.toLocaleString("en-IN") + " days" +
+          " \u00b7 Interest " + formatINR(item.totalInterest, 0) +
+          " \u00b7 Saved " + formatDate(new Date(item.savedAt));
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "s-actions";
+      const loadBtn = document.createElement("button");
+      loadBtn.className = "s-load";
+      loadBtn.textContent = "Load";
+      loadBtn.addEventListener("click", () => {
+        if (isMulti) { loadMultiEntry(item); }
+        else {
+          setMode("single");
+          nameInput.value = item.name || "";
+          amountInput.value = item.amount;
+          fromInput.value = item.fromISO;
+          toInput.value = item.toISO;
+          recalcSingle(true);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+      const delBtn = document.createElement("button");
+      delBtn.className = "s-del";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", () => {
+        const list = loadSaved();
+        list.splice(idx, 1);
+        persistSaved(list);
+        renderSavedList();
+      });
+      actions.append(loadBtn, delBtn);
+
+      div.append(top, meta, actions);
+      savedList.appendChild(div);
+    });
+  }
 
   el("clearAllBtn").addEventListener("click", () => {
     if (confirm("Delete all saved summaries?")) {
       persistSaved([]);
-      renderSaved();
+      renderSavedList();
+    }
+  });
+
+  /* Enter key = calculate (single mode inputs only) */
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.tagName === "INPUT" && el("modeSingle").contains(e.target)) {
+      e.preventDefault();
+      recalcSingle(true);
     }
   });
 
   /* ==================== Init ==================== */
-  toInput.value = todayISO();     /* To Date pre-filled with today */
-  renderSaved();
+  toInput.value = todayISO();   /* single mode To Date = today */
+  addRow();                     /* start multi mode with one blank row (To Date = today) */
+  renderSavedList();
 })();
 </script>
 </body>
