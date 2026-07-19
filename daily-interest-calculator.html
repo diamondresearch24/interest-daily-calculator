@@ -31,25 +31,25 @@
     background: var(--bg);
     color: var(--ink);
     min-height: 100vh;
-    padding: 24px 16px 48px;
+    padding: 10px;               /* small padding, page spans full width */
     line-height: 1.5;
   }
 
-  .wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-  .narrow { max-width: 640px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+  .wrap { width: 100%; max-width: none; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .narrow { width: 100%; max-width: none; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 
   /* ============ Cards ============ */
   .card {
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 28px 26px;
+    padding: 18px 16px;
     transition: box-shadow 0.25s ease;
   }
   .card:hover { box-shadow: 0 8px 28px rgba(30, 41, 59, 0.12); }
 
   /* ============ Header + tabs ============ */
-  .app-header { text-align: center; padding: 30px 26px 22px; border-top: 5px solid var(--blue); }
+  .app-header { text-align: center; padding: 20px 16px 16px; border-top: 5px solid var(--blue); }
   .app-header h1 { font-size: 1.65rem; font-weight: 700; color: var(--blue-dark); letter-spacing: -0.01em; }
   .app-header p { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
 
@@ -86,7 +86,7 @@
   }
 
   .mode { display: none; animation: fadeIn 0.3s ease; }
-  .mode.active { display: flex; flex-direction: column; gap: 20px; }
+  .mode.active { display: flex; flex-direction: column; gap: 14px; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   /* ============ Form ============ */
@@ -164,6 +164,8 @@
   .btn-ghost:hover { background: #f8fafc; }
   .btn-green { background: var(--green); color: #fff; }
   .btn-green:hover { background: #15803d; }
+  .btn-danger { background: var(--danger-soft); color: var(--danger); border-color: #fca5a5 !important; }
+  .btn-danger:hover { background: #fecaca; }
 
   .section-title {
     font-size: 1.1rem;
@@ -406,7 +408,7 @@
   }
 
   @media (max-width: 480px) {
-    .card { padding: 22px 18px; }
+    .card { padding: 14px 12px; }
     .app-header h1 { font-size: 1.35rem; }
     .date-row { flex-wrap: wrap; }
     .btn-today { width: 100%; }
@@ -539,6 +541,7 @@
 
       <div class="btn-row table-actions">
         <button type="button" class="btn btn-primary" id="addRowBtn">+ Add New Entry</button>
+        <button type="button" class="btn btn-ghost" id="multiResetBtn">Reset</button>
       </div>
     </div>
 
@@ -1008,6 +1011,41 @@
     tr.querySelector("input[type='number']").focus();
   });
 
+  /* Reset the ledger to start a new person: clears name + all rows.
+     Uses an inline two-click confirmation (confirm() dialogs are blocked
+     in some embedded/sandboxed environments). */
+  const multiResetBtn = el("multiResetBtn");
+  let resetArmed = false;
+  let resetTimer = null;
+
+  function disarmReset() {
+    resetArmed = false;
+    clearTimeout(resetTimer);
+    multiResetBtn.textContent = "Reset";
+    multiResetBtn.classList.remove("btn-danger");
+  }
+
+  function doMultiReset() {
+    disarmReset();
+    multiName.value = "";
+    rows = [];
+    ledgerBody.innerHTML = "";
+    addRow();                       /* fresh blank row, To Date = today */
+    updateMultiTotals();
+    multiName.focus();
+  }
+
+  multiResetBtn.addEventListener("click", () => {
+    const hasData = multiName.value.trim() !== "" ||
+      rows.some((r) => r.amount !== "" || r.fromISO !== "");
+    if (!hasData || resetArmed) { doMultiReset(); return; }
+    /* first click: arm the button and ask for a second click */
+    resetArmed = true;
+    multiResetBtn.textContent = "Click again to confirm reset";
+    multiResetBtn.classList.add("btn-danger");
+    resetTimer = setTimeout(disarmReset, 4000);
+  });
+
   /* --------- Snapshot of valid entries (used by save/export/print) --------- */
   function multiSnapshot() {
     const entries = [];
@@ -1225,11 +1263,25 @@
     });
   }
 
-  el("clearAllBtn").addEventListener("click", () => {
-    if (confirm("Delete all saved summaries?")) {
-      persistSaved([]);
-      renderSavedList();
+  /* Clear All also uses inline two-click confirmation */
+  const clearAllBtn = el("clearAllBtn");
+  let clearArmed = false;
+  let clearTimer = null;
+  clearAllBtn.addEventListener("click", () => {
+    if (!clearArmed) {
+      clearArmed = true;
+      clearAllBtn.textContent = "Click again to confirm";
+      clearTimer = setTimeout(() => {
+        clearArmed = false;
+        clearAllBtn.textContent = "Clear All";
+      }, 4000);
+      return;
     }
+    clearTimeout(clearTimer);
+    clearArmed = false;
+    clearAllBtn.textContent = "Clear All";
+    persistSaved([]);
+    renderSavedList();
   });
 
   /* Enter key = calculate (single mode inputs only) */
